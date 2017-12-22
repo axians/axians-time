@@ -1,0 +1,132 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<script src="../moment/min/moment-with-locales.min.js"></script>
+
+<dom-module id="axians-time">
+  <template>
+    <span title="[[timestamp]]">[[time]]</span>
+  </template>
+
+  <script>
+    /**
+     * `axians-time`
+     * Time tag which updates itself.
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class AxiansTime extends Polymer.Element {
+      static get is() { return 'axians-time'; }
+      static get properties() {
+        return {
+          timestamp: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true,
+            value: moment().format()
+          },
+          locale: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true,
+            value: 'en'
+          },
+          format: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true,
+            value: 'LLL'
+          },
+          update: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true,
+            observer: '_updateChanged',
+            value: false
+          },
+          relative: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true,
+            observer: '_relativeChanged',
+            value: false
+          },
+          time: {
+            type: String,
+            notify: true
+          }
+        };
+      }
+      static get observers() {
+        return [
+          'formatTime(timestamp, locale, format, relative)'
+        ];
+      }
+      _updateChanged(value) {
+        if (value) {
+          this.setUpdateInterval();
+        } else {
+          this.clearUpdateInterval();
+        }
+      }
+      _relativeChanged(value) {
+        if (value) {
+          this.setRelativeInterval();
+        } else {
+          this.clearRelativeInterval();
+        }
+      }
+      ready() {
+        super.ready();
+        this.formatTime(this.timestamp, this.locale, this.format, this.relative);
+      }
+      connectedCallback() {
+        super.connectedCallback();
+        if (this.update) {
+          this.setUpdateInterval();
+        }
+        if (this.relative) {
+          this.setRelativeInterval();
+        }
+      }
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.clearRelativeInterval();
+        this.clearUpdateInterval();
+      }
+      clearUpdateInterval() {
+        if (this.updateInterval) {
+          clearInterval(this.updateInterval);
+          this.updateInterval = undefined;
+        }
+      }
+      setUpdateInterval() {
+        this.clearUpdateInterval();
+        let self = this;
+        this.updateInterval = setInterval(function() {
+          self.timestamp = moment().format();
+        }, 1000);
+      }
+      clearRelativeInterval() {
+        if (this.relativeInterval) {
+          clearInterval(this.relativeInterval);
+          this.relativeInterval = undefined;
+        }
+      }
+      setRelativeInterval() {
+        this.clearRelativeInterval();
+        let self = this;
+        this.relativeInterval = setInterval(function() {
+          self.formatTime(self.timestamp, self.locale, self.format, self.relative);
+        }, 5000);
+      }
+      formatTime(timestamp, locale, format, relative) {
+        let m = moment(timestamp).locale(locale);
+        this.time = relative ? m.fromNow() : m.format(format);
+      }
+    }
+
+    window.customElements.define(AxiansTime.is, AxiansTime);
+  </script>
+</dom-module>
