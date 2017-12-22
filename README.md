@@ -1,6 +1,24 @@
 # \<axians-time\>
 
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/axians/axians-time)
+
 Time tag which updates itself.
+
+## Demo
+
+<!--
+```
+<custom-element-demo>
+  <template>
+    <link rel="import" href="axians-time.html">
+  </template>
+</custom-element-demo>
+```
+-->
+```html
+<axians-time locale="it" format="HH:mm:ss" update></axians-time>
+<axians-time locale="it" relative></axians-time>
+```
 
 ## Install the Polymer-CLI
 
