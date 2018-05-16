@@ -148,8 +148,14 @@
         const diff = Math.abs(moment().diff(m));
         for (let step of this.formatSteps) {
           if (diff < step.diff) {
-            this.time = step.relative ? this.relativeFormat(m) : m.format(step.format);
-            return;
+            if (step.relative) {
+              this.setRelativeInterval();
+              this.time = this.relativeFormat(m);
+            } else {
+              this.clearRelativeInterval();
+              this.time = m.format(step.format);
+              return;
+            }
           }
         }
         this.time = relative ? this.relativeFormat(m) : m.format(format);
