@@ -38,6 +38,10 @@
             reflectToAttribute: true,
             value: 'LLL'
           },
+          formatSteps: {
+            type: Array,
+            value: []
+          },
           update: {
             type: Boolean,
             notify: true,
@@ -52,6 +56,12 @@
             observer: '_relativeChanged',
             value: false
           },
+          nowThreshold: {
+            type: Number,
+            notify: true,
+            reflectToAttribute: true,
+            value: 0
+          },
           time: {
             type: String,
             notify: true
@@ -62,6 +72,11 @@
         return [
           'formatTime(timestamp, locale, format, relative)'
         ];
+      }
+      constructor() {
+        super();
+        moment.updateLocale('en', { now: 'now' });
+        moment.updateLocale('it', { now: 'adesso' });
       }
       _updateChanged(value) {
         if (value) {
@@ -121,9 +136,23 @@
           self.formatTime(self.timestamp, self.locale, self.format, self.relative);
         }, 5000);
       }
+      relativeFormat(m) {
+        if (Math.abs(moment().diff(m)) < this.nowThreshold) {
+            return moment.localeData(m.locale())._now;
+        } else {
+            return m.fromNow();
+        }
+      }
       formatTime(timestamp, locale, format, relative) {
         let m = moment(timestamp).locale(locale);
-        this.time = relative ? m.fromNow() : m.format(format);
+        const diff = Math.abs(moment().diff(m));
+        for (let step of this.formatSteps) {
+          if (diff < step.diff) {
+            this.time = step.relative ? this.relativeFormat(m) : m.format(step.format);
+            return;
+          }
+        }
+        this.time = relative ? this.relativeFormat(m) : m.format(format);
       }
     }
 
