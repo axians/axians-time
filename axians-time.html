@@ -154,8 +154,8 @@
             } else {
               this.clearRelativeInterval();
               this.time = m.format(step.format);
-              return;
             }
+            return;
           }
         }
         this.time = relative ? this.relativeFormat(m) : m.format(format);
