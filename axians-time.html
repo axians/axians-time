@@ -4,7 +4,7 @@
 
 <dom-module id="axians-time">
   <template>
-    <span title="[[timestamp]]">[[time]]</span>
+    <span title="[[formatted]]">[[display]]</span>
   </template>
 
   <script>
@@ -17,7 +17,9 @@
      * @demo demo/index.html
      */
     class AxiansTime extends Polymer.Element {
+
       static get is() { return 'axians-time'; }
+
       static get properties() {
         return {
           timestamp: {
@@ -62,22 +64,30 @@
             reflectToAttribute: true,
             value: 0
           },
-          time: {
+          display: {
+            type: String,
+            notify: true
+          },
+          formatted: {
             type: String,
             notify: true
           }
         };
       }
+
       static get observers() {
         return [
-          'formatTime(timestamp, locale, format, relative)'
+          'formatDisplay(timestamp, locale, format, relative)',
+          'formatStatic(timestamp, locale, format)'
         ];
       }
+
       constructor() {
         super();
         moment.updateLocale('en', { now: 'now' });
         moment.updateLocale('it', { now: 'adesso' });
       }
+
       _updateChanged(value) {
         if (value) {
           this.setUpdateInterval();
@@ -85,6 +95,7 @@
           this.clearUpdateInterval();
         }
       }
+
       _relativeChanged(value) {
         if (value) {
           this.setRelativeInterval();
@@ -92,10 +103,12 @@
           this.clearRelativeInterval();
         }
       }
+
       ready() {
         super.ready();
-        this.formatTime(this.timestamp, this.locale, this.format, this.relative);
+        this.formatDisplay(this.timestamp, this.locale, this.format, this.relative);
       }
+
       connectedCallback() {
         super.connectedCallback();
         if (this.update) {
@@ -105,17 +118,20 @@
           this.setRelativeInterval();
         }
       }
+
       disconnectedCallback() {
         super.disconnectedCallback();
         this.clearRelativeInterval();
         this.clearUpdateInterval();
       }
+
       clearUpdateInterval() {
         if (this.updateInterval) {
           clearInterval(this.updateInterval);
           this.updateInterval = undefined;
         }
       }
+
       setUpdateInterval() {
         this.clearUpdateInterval();
         let self = this;
@@ -123,19 +139,22 @@
           self.timestamp = moment().format();
         }, 1000);
       }
+
       clearRelativeInterval() {
         if (this.relativeInterval) {
           clearInterval(this.relativeInterval);
           this.relativeInterval = undefined;
         }
       }
+
       setRelativeInterval() {
         this.clearRelativeInterval();
         let self = this;
         this.relativeInterval = setInterval(function() {
-          self.formatTime(self.timestamp, self.locale, self.format, self.relative);
+          self.formatDisplay(self.timestamp, self.locale, self.format, self.relative);
         }, 5000);
       }
+
       relativeFormat(m) {
         if (Math.abs(moment().diff(m)) < this.nowThreshold) {
             return moment.localeData(m.locale())._now;
@@ -143,22 +162,28 @@
             return m.fromNow();
         }
       }
-      formatTime(timestamp, locale, format, relative) {
+
+      formatDisplay(timestamp, locale, format, relative) {
         let m = moment(timestamp).locale(locale);
         const diff = Math.abs(moment().diff(m));
         for (let step of this.formatSteps) {
           if (diff < step.diff) {
             if (step.relative) {
               this.setRelativeInterval();
-              this.time = this.relativeFormat(m);
+              this.display = this.relativeFormat(m);
             } else {
               this.clearRelativeInterval();
-              this.time = m.format(step.format);
+              this.display = m.format(step.format);
             }
             return;
           }
         }
-        this.time = relative ? this.relativeFormat(m) : m.format(format);
+        this.display = relative ? this.relativeFormat(m) : m.format(format);
+      }
+
+      formatStatic(timestamp, locale, format) {
+        let m = moment(timestamp).locale(locale);
+        this.formatted = m.format(format);
       }
     }
 
