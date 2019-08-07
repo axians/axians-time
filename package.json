@@ -1,0 +1,37 @@
+{
+  "name": "@axians/axians-time",
+  "version": "2.0.0",
+  "description": "Generated with typescript.java",
+  "author": "Giovanni Lovato <giovanni@lova.to>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/axians/axians-time",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/axians/axians-time.git"
+  },
+  "bugs": {
+    "url": "https://github.com/axians/axians-time/issues"
+  },
+  "main": "dist/axians-time.js",
+  "scripts": {
+    "pretest": "tsc -p tsconfig.json",
+    "test": "karma start --coverage",
+    "test:watch": "karma start --auto-watch=true --single-run=false",
+    "test:update-snapshots": "karma start --update-snapshots",
+    "test:prune-snapshots": "karma start --prune-snapshots",
+    "test:compatibility": "karma start --compatibility all --auto-watch=true --single-run=false"
+  },
+  "dependencies": {
+    "lit-element": "^2.1.0",
+    "luxon": "^1.17.2"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^2.2.7",
+    "@open-wc/testing-karma": "^3.1.11",
+    "@types/luxon": "^1.15.2",
+    "@webcomponents/webcomponentsjs": "^2.2.7",
+    "deepmerge": "^4.0.0",
+    "karma": "^4.2.0",
+    "typescript": "^3.5.3"
+  }
+}
